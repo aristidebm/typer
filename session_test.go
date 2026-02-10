@@ -21,8 +21,8 @@ func TestHandleKey(t *testing.T) {
 				CurrentWord: 0,
 				Words: []Word{
 					{
-						Text:     "hello",
-						Progress: "hello",
+						Text:     []rune("hello"),
+						Progress: []rune("hello"),
 						Events: []KeyEvent{
 							{
 								Key:     'h',
@@ -57,8 +57,8 @@ func TestHandleKey(t *testing.T) {
 				CurrentWord: 1,
 				Words: []Word{
 					{
-						Text:     "Hello",
-						Progress: "Hello",
+						Text:     []rune("Hello"),
+						Progress: []rune("Hello"),
 						Events: []KeyEvent{
 							{
 								Key:     'H',
@@ -83,8 +83,8 @@ func TestHandleKey(t *testing.T) {
 						},
 					},
 					{
-						Text:     "World",
-						Progress: "World",
+						Text:     []rune("World"),
+						Progress: []rune("World"),
 						Events: []KeyEvent{
 							{
 								Key:     'W',
@@ -145,8 +145,8 @@ func TestDeleteWord(t *testing.T) {
 				CurrentWord: 1,
 				Words: []Word{
 					{
-						Text:     "Hello",
-						Progress: "Hello",
+						Text:     []rune("Hello"),
+						Progress: []rune("Hello"),
 						Events: []KeyEvent{
 							{
 								Key:     'H',
@@ -171,8 +171,8 @@ func TestDeleteWord(t *testing.T) {
 						},
 					},
 					{
-						Text:     "World",
-						Progress: "",
+						Text:     []rune("World"),
+						Progress: []rune(""),
 						Events: []KeyEvent{
 							{
 								Key:     'W',
@@ -199,8 +199,8 @@ func TestDeleteWord(t *testing.T) {
 				CurrentWord: 0,
 				Words: []Word{
 					{
-						Text:     "Hello",
-						Progress: "",
+						Text:     []rune("Hello"),
+						Progress: []rune(""),
 						Events: []KeyEvent{
 							{
 								Key:     'H',
@@ -225,8 +225,8 @@ func TestDeleteWord(t *testing.T) {
 						},
 					},
 					{
-						Text:     "World",
-						Progress: "",
+						Text:     []rune("World"),
+						Progress: []rune(""),
 						Events:   []KeyEvent{},
 					},
 				},
@@ -240,8 +240,8 @@ func TestDeleteWord(t *testing.T) {
 				CurrentWord: 1,
 				Words: []Word{
 					{
-						Text:     "Hello",
-						Progress: "",
+						Text:     []rune("Hello"),
+						Progress: []rune(""),
 						Events: []KeyEvent{
 							{
 								Key:     'H',
@@ -266,8 +266,8 @@ func TestDeleteWord(t *testing.T) {
 						},
 					},
 					{
-						Text:     "World",
-						Progress: "",
+						Text:     []rune("World"),
+						Progress: []rune(""),
 						Events: []KeyEvent{
 							{
 								Key:     'W',
@@ -341,8 +341,8 @@ func TestMissingKeys(t *testing.T) {
 				CurrentWord: 0,
 				Words: []Word{
 					{
-						Text:     "hello",
-						Progress: "hexlo",
+						Text:     []rune("hello"),
+						Progress: []rune("hexlo"),
 						Events: []KeyEvent{
 							{
 								Key:     'h',
@@ -377,8 +377,8 @@ func TestMissingKeys(t *testing.T) {
 				CurrentWord: 0,
 				Words: []Word{
 					{
-						Text:     "hello",
-						Progress: "Hello",
+						Text:     []rune("hello"),
+						Progress: []rune("Hello"),
 						Events: []KeyEvent{
 							{
 								Key:     'H',
@@ -413,8 +413,8 @@ func TestMissingKeys(t *testing.T) {
 				CurrentWord: 0,
 				Words: []Word{
 					{
-						Text:     "hello",
-						Progress: "hellp",
+						Text:     []rune("hello"),
+						Progress: []rune("hellp"),
 						Events: []KeyEvent{
 							{
 								Key:     'h',
@@ -467,13 +467,13 @@ func CompareSessions(t *testing.T, actual Session, expected Session) {
 		}
 
 		// check Text
-		if actual.Words[i].Text != expected.Words[i].Text {
-			t.Errorf("Text expected: %s, actual: %s", expected.Words[i].Text, actual.Words[i].Text)
+		if string(actual.Words[i].Text) != string(expected.Words[i].Text) {
+			t.Errorf("Text expected: %s, actual: %s", string(expected.Words[i].Text), string(actual.Words[i].Text))
 		}
 
 		// check Progress
-		if actual.Words[i].Progress != expected.Words[i].Progress {
-			t.Errorf("Progress expected: %s, actual: %s", expected.Words[i].Progress, actual.Words[i].Progress)
+		if string(actual.Words[i].Progress) != string(expected.Words[i].Progress) {
+			t.Errorf("Progress expected: %s, actual: %s", string(expected.Words[i].Progress), string(actual.Words[i].Progress))
 		}
 
 		// check Events

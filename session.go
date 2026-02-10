@@ -14,10 +14,66 @@ type KeyEvent struct {
 	Correct bool      `json:"correct"`
 }
 
+func (ke *KeyEvent) MarshalJSON() ([]byte, error) {
+	aux := struct {
+		Key     string    `json:"key"`
+		Date    time.Time `json:"date"`
+		Correct bool      `json:"correct"`
+	}{
+		Key:     string(ke.Key),
+		Date:    ke.Date,
+		Correct: ke.Correct,
+	}
+	return json.Marshal(&aux)
+}
+
+func (ke *KeyEvent) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		Key     string    `json:"key"`
+		Date    time.Time `json:"date"`
+		Correct bool      `json:"correct"`
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	ke.Key = []rune(aux.Key)[0]
+	ke.Date = aux.Date
+	ke.Correct = aux.Correct
+	return nil
+}
+
 type Word struct {
-	Text     string     `json:"text"`
-	Progress string     `json:"progress"`
+	Text     []rune     `json:"text"`
+	Progress []rune     `json:"progress"`
 	Events   []KeyEvent `json:"events"`
+}
+
+func (w *Word) MarshalJSON() ([]byte, error) {
+	aux := struct {
+		Text     string     `json:"text"`
+		Progress string     `json:"progress"`
+		Events   []KeyEvent `json:"events"`
+	}{
+		Text:     string(w.Text),
+		Progress: string(w.Progress),
+		Events:   w.Events,
+	}
+	return json.Marshal(&aux)
+}
+
+func (w *Word) UnmarshalJSON(data []byte) error {
+	aux := struct {
+		Text     string     `json:"text"`
+		Progress string     `json:"progress"`
+		Events   []KeyEvent `json:"events"`
+	}{}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	w.Text = []rune(aux.Text)
+	w.Progress = []rune(aux.Progress)
+	w.Events = aux.Events
+	return nil
 }
 
 func (w *Word) IsMissed() bool {
@@ -63,28 +119,30 @@ func (s *Session) HandleKey(key rune) {
 		s.nextWord()
 		return
 	}
-	word.Progress += string(key)
+	word.Progress = append(word.Progress, key)
 	word.Events = append(word.Events, KeyEvent{
 		Key:     key,
 		Date:    time.Now().UTC(),
-		Correct: strings.HasPrefix(word.Text, word.Progress),
+		Correct: word.Progress[len(word.Progress)-1] == word.Text[len(word.Progress)-1],
 	})
 }
 
 func (s *Session) DeleteWord() {
 	word := &s.Words[s.CurrentWord]
-	if word.Progress != "" {
-		word.Progress = ""
+	if len(word.Progress) != 0 {
+		word.Progress = nil
 		return
 	}
 	s.prevWord()
 	word = &s.Words[s.CurrentWord]
-	word.Progress = ""
+	word.Progress = nil
 }
 
 func (s *Session) ComputeResult() {
 	for _, word := range s.Words {
-		s.Result.Missing = append(s.Result.Missing, word.Text)
+		if word.IsMissed() {
+			s.Result.Missing = append(s.Result.Missing, string(word.Text))
+		}
 	}
 }
 
@@ -115,7 +173,7 @@ func wordsFrom(r io.Reader) ([]Word, error) {
 
 	var words []Word
 	for word := range strings.FieldsSeq(text) {
-		words = append(words, Word{Text: word})
+		words = append(words, Word{Text: []rune(word)})
 	}
 	return words, nil
 }
