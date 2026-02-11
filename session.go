@@ -9,36 +9,42 @@ import (
 )
 
 type KeyEvent struct {
-	Key     rune      `json:"key"`
-	Date    time.Time `json:"date"`
-	Correct bool      `json:"correct"`
+	Key         rune      `json:"key"`
+	Date        time.Time `json:"date"`
+	ExpectedKey rune      `json:"expecteKey"`
+}
+
+func (ke KeyEvent) IsMissed() bool {
+	return ke.ExpectedKey != ke.Key
 }
 
 func (ke *KeyEvent) MarshalJSON() ([]byte, error) {
 	aux := struct {
-		Key     string    `json:"key"`
-		Date    time.Time `json:"date"`
-		Correct bool      `json:"correct"`
+		Key         string    `json:"key"`
+		Date        time.Time `json:"date"`
+		ExpectedKey string    `json:"expecteKey"`
+		Correct     bool      `json:"correct"`
 	}{
-		Key:     string(ke.Key),
-		Date:    ke.Date,
-		Correct: ke.Correct,
+		Key:         string(ke.Key),
+		Date:        ke.Date,
+		ExpectedKey: string(ke.ExpectedKey),
+		Correct:     !ke.IsMissed(),
 	}
 	return json.Marshal(&aux)
 }
 
 func (ke *KeyEvent) UnmarshalJSON(data []byte) error {
 	aux := &struct {
-		Key     string    `json:"key"`
-		Date    time.Time `json:"date"`
-		Correct bool      `json:"correct"`
+		Key         string    `json:"key"`
+		Date        time.Time `json:"date"`
+		ExpectedKey string    `json:"expecteKey"`
 	}{}
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
 	ke.Key = []rune(aux.Key)[0]
+	ke.ExpectedKey = []rune(aux.ExpectedKey)[0]
 	ke.Date = aux.Date
-	ke.Correct = aux.Correct
 	return nil
 }
 
@@ -78,7 +84,7 @@ func (w *Word) UnmarshalJSON(data []byte) error {
 
 func (w *Word) IsMissed() bool {
 	for _, evt := range w.Events {
-		if !evt.Correct {
+		if evt.IsMissed() {
 			return true
 		}
 	}
@@ -121,21 +127,16 @@ func (s *Session) HandleKey(key rune) {
 	}
 
 	word.Progress = append(word.Progress, key)
-
-	isCorrect := func() bool {
-		if len(word.Progress) >= len(word.Text) {
-			if string(word.Text) != string(word.Progress) {
-				return false
-			}
-			return true
-		}
-		return word.Progress[len(word.Progress)-1] == word.Text[len(word.Progress)-1]
+	expectedKeyIndex := min(len(word.Text)-1, len(word.Progress)-1)
+	expectedKey := word.Text[expectedKeyIndex]
+	if len(word.Progress) >= len(word.Text) && !unicode.IsSpace(key) {
+		expectedKey = []rune(" ")[0]
 	}
 
 	word.Events = append(word.Events, KeyEvent{
-		Key:     key,
-		Date:    time.Now().UTC(),
-		Correct: isCorrect(),
+		Key:         key,
+		Date:        time.Now().UTC(),
+		ExpectedKey: expectedKey,
 	})
 }
 

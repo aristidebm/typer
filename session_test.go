@@ -25,24 +25,24 @@ func TestHandleKey(t *testing.T) {
 						Progress: []rune("hello"),
 						Events: []KeyEvent{
 							{
-								Key:     'h',
-								Correct: true,
+								Key:         'h',
+								ExpectedKey: 'h',
 							},
 							{
-								Key:     'e',
-								Correct: true,
+								Key:         'e',
+								ExpectedKey: 'e',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 						},
 					},
@@ -61,24 +61,24 @@ func TestHandleKey(t *testing.T) {
 						Progress: []rune("Hello"),
 						Events: []KeyEvent{
 							{
-								Key:     'H',
-								Correct: true,
+								Key:         'H',
+								ExpectedKey: 'H',
 							},
 							{
-								Key:     'e',
-								Correct: true,
+								Key:         'e',
+								ExpectedKey: 'e',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'l',
 							},
 						},
 					},
@@ -87,24 +87,24 @@ func TestHandleKey(t *testing.T) {
 						Progress: []rune("World"),
 						Events: []KeyEvent{
 							{
-								Key:     'W',
-								Correct: true,
+								Key:         'W',
+								ExpectedKey: 'W',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 							{
-								Key:     'r',
-								Correct: true,
+								Key:         'r',
+								ExpectedKey: 'r',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'd',
-								Correct: true,
+								Key:         'd',
+								ExpectedKey: 'd',
 							},
 						},
 					},
@@ -149,24 +149,24 @@ func TestDeleteWord(t *testing.T) {
 						Progress: []rune("Hello"),
 						Events: []KeyEvent{
 							{
-								Key:     'H',
-								Correct: true,
+								Key:         'H',
+								ExpectedKey: 'H',
 							},
 							{
-								Key:     'e',
-								Correct: true,
+								Key:         'e',
+								ExpectedKey: 'e',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 						},
 					},
@@ -175,16 +175,16 @@ func TestDeleteWord(t *testing.T) {
 						Progress: []rune(""),
 						Events: []KeyEvent{
 							{
-								Key:     'W',
-								Correct: true,
+								Key:         'W',
+								ExpectedKey: 'W',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 							{
-								Key:     'r',
-								Correct: true,
+								Key:         'r',
+								ExpectedKey: 'r',
 							},
 						},
 					},
@@ -203,24 +203,24 @@ func TestDeleteWord(t *testing.T) {
 						Progress: []rune(""),
 						Events: []KeyEvent{
 							{
-								Key:     'H',
-								Correct: true,
+								Key:         'H',
+								ExpectedKey: 'H',
 							},
 							{
-								Key:     'e',
-								Correct: true,
+								Key:         'e',
+								ExpectedKey: 'e',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 						},
 					},
@@ -244,24 +244,24 @@ func TestDeleteWord(t *testing.T) {
 						Progress: []rune(""),
 						Events: []KeyEvent{
 							{
-								Key:     'H',
-								Correct: true,
+								Key:         'H',
+								ExpectedKey: 'H',
 							},
 							{
-								Key:     'e',
-								Correct: true,
+								Key:         'e',
+								ExpectedKey: 'e',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 						},
 					},
@@ -270,24 +270,24 @@ func TestDeleteWord(t *testing.T) {
 						Progress: []rune(""),
 						Events: []KeyEvent{
 							{
-								Key:     'W',
-								Correct: true,
+								Key:         'W',
+								ExpectedKey: 'W',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 							{
-								Key:     'r',
-								Correct: true,
+								Key:         'r',
+								ExpectedKey: 'r',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'd',
-								Correct: true,
+								Key:         'd',
+								ExpectedKey: 'd',
 							},
 						},
 					},
@@ -345,24 +345,24 @@ func TestMissingKeys(t *testing.T) {
 						Progress: []rune("hexlo"),
 						Events: []KeyEvent{
 							{
-								Key:     'h',
-								Correct: true,
+								Key:         'h',
+								ExpectedKey: 'h',
 							},
 							{
-								Key:     'e',
-								Correct: true,
+								Key:         'e',
+								ExpectedKey: 'e',
 							},
 							{
-								Key:     'x',
-								Correct: false,
+								Key:         'x',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 						},
 					},
@@ -381,24 +381,24 @@ func TestMissingKeys(t *testing.T) {
 						Progress: []rune("Hello"),
 						Events: []KeyEvent{
 							{
-								Key:     'H',
-								Correct: false,
+								Key:         'H',
+								ExpectedKey: 'h',
 							},
 							{
-								Key:     'e',
-								Correct: true,
+								Key:         'e',
+								ExpectedKey: 'e',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 						},
 					},
@@ -417,24 +417,24 @@ func TestMissingKeys(t *testing.T) {
 						Progress: []rune("hellp"),
 						Events: []KeyEvent{
 							{
-								Key:     'h',
-								Correct: true,
+								Key:         'h',
+								ExpectedKey: 'h',
 							},
 							{
-								Key:     'e',
-								Correct: true,
+								Key:         'e',
+								ExpectedKey: 'e',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'p',
-								Correct: false,
+								Key:         'p',
+								ExpectedKey: 'o',
 							},
 						},
 					},
@@ -454,44 +454,44 @@ func TestMissingKeys(t *testing.T) {
 						Progress: []rune("helloworld"),
 						Events: []KeyEvent{
 							{
-								Key:     'h',
-								Correct: true,
+								Key:         'h',
+								ExpectedKey: 'h',
 							},
 							{
-								Key:     'e',
-								Correct: true,
+								Key:         'e',
+								ExpectedKey: 'e',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'l',
-								Correct: true,
+								Key:         'l',
+								ExpectedKey: 'l',
 							},
 							{
-								Key:     'o',
-								Correct: true,
+								Key:         'o',
+								ExpectedKey: 'o',
 							},
 							{
-								Key:     'w',
-								Correct: false,
+								Key:         'w',
+								ExpectedKey: ' ',
 							},
 							{
-								Key:     'o',
-								Correct: false,
+								Key:         'o',
+								ExpectedKey: ' ',
 							},
 							{
-								Key:     'r',
-								Correct: false,
+								Key:         'r',
+								ExpectedKey: ' ',
 							},
 							{
-								Key:     'l',
-								Correct: false,
+								Key:         'l',
+								ExpectedKey: ' ',
 							},
 							{
-								Key:     'd',
-								Correct: false,
+								Key:         'd',
+								ExpectedKey: ' ',
 							},
 						},
 					},
@@ -535,11 +535,11 @@ func TestMissingKeys(t *testing.T) {
 // 						Events: []KeyEvent{
 // 							{
 // 								Key:     'h',
-// 								Correct: true,
+// 								ExpectedKey: '',
 // 							},
 // 							{
 // 								Key:     'e',
-// 								Correct: true,
+// 								ExpectedKey: '',
 // 							},
 // 							{
 // 								Key:     'x',
@@ -547,11 +547,11 @@ func TestMissingKeys(t *testing.T) {
 // 							},
 // 							{
 // 								Key:     'l',
-// 								Correct: true,
+// 								ExpectedKey: '',
 // 							},
 // 							{
 // 								Key:     'o',
-// 								Correct: true,
+// 								ExpectedKey: '',
 // 							},
 // 						},
 // 					},
@@ -598,8 +598,8 @@ func CompareSessions(t *testing.T, actual Session, expected Session) {
 			if actual.Words[i].Events[j].Key != expected.Words[i].Events[j].Key {
 				t.Errorf("KeyEvent at position %d on word %d expected: %d, actual: %d", j, i, expected.Words[i].Events[j].Key, actual.Words[i].Events[j].Key)
 			}
-			if actual.Words[i].Events[j].Correct != expected.Words[i].Events[j].Correct {
-				t.Errorf("KeyEvent at position %d on word %d expected: %v, actual: %v", j, i, expected.Words[i].Events[j].Correct, actual.Words[i].Events[j].Correct)
+			if actual.Words[i].Events[j].ExpectedKey != expected.Words[i].Events[j].ExpectedKey {
+				t.Errorf("KeyEvent at position %d on word %d expected: %v, actual: %v", j, i, expected.Words[i].Events[j].ExpectedKey, actual.Words[i].Events[j].ExpectedKey)
 			}
 		}
 	}
