@@ -441,6 +441,63 @@ func TestMissingKeys(t *testing.T) {
 				},
 			},
 		},
+		{
+			"MissingKeysBecauseOfSpace",
+			strings.NewReader("hello world"),
+			// notice that the user does not hit the space
+			[]rune{'h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd'},
+			Session{
+				CurrentWord: 0,
+				Words: []Word{
+					{
+						Text:     []rune("hello"),
+						Progress: []rune("helloworld"),
+						Events: []KeyEvent{
+							{
+								Key:     'h',
+								Correct: true,
+							},
+							{
+								Key:     'e',
+								Correct: true,
+							},
+							{
+								Key:     'l',
+								Correct: true,
+							},
+							{
+								Key:     'l',
+								Correct: true,
+							},
+							{
+								Key:     'o',
+								Correct: true,
+							},
+							{
+								Key:     'w',
+								Correct: false,
+							},
+							{
+								Key:     'o',
+								Correct: false,
+							},
+							{
+								Key:     'r',
+								Correct: false,
+							},
+							{
+								Key:     'l',
+								Correct: false,
+							},
+							{
+								Key:     'd',
+								Correct: false,
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range testCases {
 		t.Run(tt.Name, func(t *testing.T) {
@@ -457,6 +514,66 @@ func TestMissingKeys(t *testing.T) {
 		})
 	}
 }
+
+// func TestComputeResult(t *testing.T) {
+// 	testCases := []struct {
+// 		Name       string
+// 		Text       io.Reader
+// 		Keypresses []rune
+// 		Session    Session
+// 	}{
+// 		{
+// 			"MissingKeysInTheMiddleOfTyping",
+// 			strings.NewReader("hello world"),
+// 			[]rune{'h', 'e', 'x', 'l', 'o', ' ', 'X', 'o', 'r', 'l', 'd'},
+// 			Session{
+// 				CurrentWord: 0,
+// 				Words: []Word{
+// 					{
+// 						Text:     []rune("hello"),
+// 						Progress: []rune("hexlo"),
+// 						Events: []KeyEvent{
+// 							{
+// 								Key:     'h',
+// 								Correct: true,
+// 							},
+// 							{
+// 								Key:     'e',
+// 								Correct: true,
+// 							},
+// 							{
+// 								Key:     'x',
+// 								Correct: false,
+// 							},
+// 							{
+// 								Key:     'l',
+// 								Correct: true,
+// 							},
+// 							{
+// 								Key:     'o',
+// 								Correct: true,
+// 							},
+// 						},
+// 					},
+// 				},
+// 			},
+// 		},
+// 	}
+// 	for _, tt := range testCases {
+// 		t.Run(tt.Name, func(t *testing.T) {
+// 			// instanciate session
+// 			s, err := NewSession(tt.Text)
+// 			if err != nil {
+// 				t.Errorf("failed creating session: %s", err)
+// 			}
+// 			for _, kp := range tt.Keypresses {
+// 				s.HandleKey(kp)
+// 			}
+// 			s1 := tt.Session
+// 			CompareSessions(t, *s, s1)
+// 		})
+// 	}
+// }
 
 func CompareSessions(t *testing.T, actual Session, expected Session) {
 	for i := range actual.Words {

@@ -119,11 +119,23 @@ func (s *Session) HandleKey(key rune) {
 		s.nextWord()
 		return
 	}
+
 	word.Progress = append(word.Progress, key)
+
+	isCorrect := func() bool {
+		if len(word.Progress) >= len(word.Text) {
+			if string(word.Text) != string(word.Progress) {
+				return false
+			}
+			return true
+		}
+		return word.Progress[len(word.Progress)-1] == word.Text[len(word.Progress)-1]
+	}
+
 	word.Events = append(word.Events, KeyEvent{
 		Key:     key,
 		Date:    time.Now().UTC(),
-		Correct: word.Progress[len(word.Progress)-1] == word.Text[len(word.Progress)-1],
+		Correct: isCorrect(),
 	})
 }
 
