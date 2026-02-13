@@ -127,9 +127,9 @@ func (s *Session) HandleKey(key rune) {
 	}
 
 	word.Progress = append(word.Progress, key)
-	expectedKeyIndex := min(len(word.Text)-1, len(word.Progress)-1)
+	expectedKeyIndex := min(len(word.Text), len(word.Progress)) - 1
 	expectedKey := word.Text[expectedKeyIndex]
-	if len(word.Progress) >= len(word.Text) && !unicode.IsSpace(key) {
+	if len(word.Progress) > len(word.Text) && !unicode.IsSpace(key) {
 		expectedKey = []rune(" ")[0]
 	}
 

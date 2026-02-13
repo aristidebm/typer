@@ -1,6 +1,7 @@
 package typer
 
 import (
+	_ "fmt"
 	"io"
 	"strings"
 	"testing"
@@ -47,6 +48,7 @@ func TestHandleKey(t *testing.T) {
 						},
 					},
 				},
+				Result: Result{Missing: []string{}},
 			},
 		},
 		{
@@ -78,7 +80,7 @@ func TestHandleKey(t *testing.T) {
 							},
 							{
 								Key:         'o',
-								ExpectedKey: 'l',
+								ExpectedKey: 'o',
 							},
 						},
 					},
@@ -109,6 +111,7 @@ func TestHandleKey(t *testing.T) {
 						},
 					},
 				},
+				Result: Result{Missing: []string{}},
 			},
 		},
 	}
@@ -124,6 +127,7 @@ func TestHandleKey(t *testing.T) {
 			for _, kp := range tt.Keypresses {
 				s.HandleKey(kp)
 			}
+			s.ComputeResult()
 			s1 := tt.Session
 			CompareSessions(t, *s, s1)
 		})
@@ -189,6 +193,7 @@ func TestDeleteWord(t *testing.T) {
 						},
 					},
 				},
+				Result: Result{Missing: []string{}},
 			},
 		},
 		{
@@ -230,6 +235,7 @@ func TestDeleteWord(t *testing.T) {
 						Events:   []KeyEvent{},
 					},
 				},
+				Result: Result{Missing: []string{}},
 			},
 		},
 		{
@@ -292,6 +298,7 @@ func TestDeleteWord(t *testing.T) {
 						},
 					},
 				},
+				Result: Result{Missing: []string{}},
 			},
 		},
 	}
@@ -319,7 +326,7 @@ func TestDeleteWord(t *testing.T) {
 			for _ = range numberOfDeletion {
 				s.DeleteWord()
 			}
-
+			s.ComputeResult()
 			s1 := tt.Session
 			CompareSessions(t, *s, s1)
 		})
@@ -367,6 +374,7 @@ func TestMissingKeys(t *testing.T) {
 						},
 					},
 				},
+				Result: Result{Missing: []string{"hello"}},
 			},
 		},
 		{
@@ -403,6 +411,7 @@ func TestMissingKeys(t *testing.T) {
 						},
 					},
 				},
+				Result: Result{Missing: []string{"hello"}},
 			},
 		},
 		{
@@ -439,11 +448,12 @@ func TestMissingKeys(t *testing.T) {
 						},
 					},
 				},
+				Result: Result{Missing: []string{"hello"}},
 			},
 		},
 		{
 			"MissingKeysBecauseOfSpace",
-			strings.NewReader("hello world"),
+			strings.NewReader("hello"),
 			// notice that the user does not hit the space
 			[]rune{'h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd'},
 			Session{
@@ -496,6 +506,7 @@ func TestMissingKeys(t *testing.T) {
 						},
 					},
 				},
+				Result: Result{Missing: []string{"hello"}},
 			},
 		},
 	}
@@ -509,81 +520,21 @@ func TestMissingKeys(t *testing.T) {
 			for _, kp := range tt.Keypresses {
 				s.HandleKey(kp)
 			}
+			s.ComputeResult()
 			s1 := tt.Session
 			CompareSessions(t, *s, s1)
 		})
 	}
 }
 
-// func TestComputeResult(t *testing.T) {
-// 	testCases := []struct {
-// 		Name       string
-// 		Text       io.Reader
-// 		Keypresses []rune
-// 		Session    Session
-// 	}{
-// 		{
-// 			"MissingKeysInTheMiddleOfTyping",
-// 			strings.NewReader("hello world"),
-// 			[]rune{'h', 'e', 'x', 'l', 'o', ' ', 'X', 'o', 'r', 'l', 'd'},
-// 			Session{
-// 				CurrentWord: 0,
-// 				Words: []Word{
-// 					{
-// 						Text:     []rune("hello"),
-// 						Progress: []rune("hexlo"),
-// 						Events: []KeyEvent{
-// 							{
-// 								Key:     'h',
-// 								ExpectedKey: '',
-// 							},
-// 							{
-// 								Key:     'e',
-// 								ExpectedKey: '',
-// 							},
-// 							{
-// 								Key:     'x',
-// 								Correct: false,
-// 							},
-// 							{
-// 								Key:     'l',
-// 								ExpectedKey: '',
-// 							},
-// 							{
-// 								Key:     'o',
-// 								ExpectedKey: '',
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 		},
-// 	}
-// 	for _, tt := range testCases {
-// 		t.Run(tt.Name, func(t *testing.T) {
-// 			// instanciate session
-// 			s, err := NewSession(tt.Text)
-// 			if err != nil {
-// 				t.Errorf("failed creating session: %s", err)
-// 			}
-// 			for _, kp := range tt.Keypresses {
-// 				s.HandleKey(kp)
-// 			}
-// 			s1 := tt.Session
-// 			CompareSessions(t, *s, s1)
-// 		})
-// 	}
-// }
-
 func CompareSessions(t *testing.T, actual Session, expected Session) {
 	for i := range actual.Words {
 
-		// check current word
+		// // check current word
 		if actual.CurrentWord != expected.CurrentWord {
 			t.Errorf("Current Word expected: %d, actual: %d", expected.CurrentWord, actual.CurrentWord)
 		}
 
-		// check Text
 		if string(actual.Words[i].Text) != string(expected.Words[i].Text) {
 			t.Errorf("Text expected: %s, actual: %s", string(expected.Words[i].Text), string(actual.Words[i].Text))
 		}
@@ -601,6 +552,17 @@ func CompareSessions(t *testing.T, actual Session, expected Session) {
 			if actual.Words[i].Events[j].ExpectedKey != expected.Words[i].Events[j].ExpectedKey {
 				t.Errorf("KeyEvent at position %d on word %d expected: %v, actual: %v", j, i, expected.Words[i].Events[j].ExpectedKey, actual.Words[i].Events[j].ExpectedKey)
 			}
+		}
+	}
+
+	// check results
+	if len(actual.Result.Missing) != len(expected.Result.Missing) {
+		t.Errorf("Result.Missing expected number: %d, actual number: %d", len(expected.Result.Missing), len(actual.Result.Missing))
+	}
+
+	for i := range actual.Result.Missing {
+		if actual.Result.Missing[i] != expected.Result.Missing[i] {
+			t.Errorf("Result.Missing at position %d expected number: %s, actual number: %s", i, expected.Result.Missing, actual.Result.Missing)
 		}
 	}
 }
