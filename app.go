@@ -27,6 +27,13 @@ func (app *App) DeleteChar() {
 	}
 }
 
+func (app *App) CurrentWordIndex() int {
+	if session := app.getCurrentSession(); session != nil {
+		return session.CurrentWord
+	}
+	return -1
+}
+
 func (app *App) CreateSession(r io.Reader) error {
 	session, err := NewSession(r)
 	if err != nil {
@@ -60,6 +67,13 @@ func (app *App) ChooseSession(index int) {
 
 func (app *App) AddSession(session *Session) {
 	app.sessions = append(app.sessions, session)
+}
+
+func (app *App) Words() []Word {
+	if session := app.getCurrentSession(); session != nil {
+		return session.Words
+	}
+	return []Word{}
 }
 
 func (app *App) getCurrentSession() *Session {

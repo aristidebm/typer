@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"example.com/typer"
 )
 
 func main() {
-	fmt.Printf("Hello, World")
+	typer.Execute()
 }
