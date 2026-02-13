@@ -39,7 +39,7 @@ func (app *App) CreateSession(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	app.AddSession(session)
+	app.AppendSession(session)
 	return nil
 }
 
@@ -48,7 +48,7 @@ func (app *App) LoadSession(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-	app.AddSession(session)
+	app.AppendSession(session)
 	return nil
 }
 
@@ -65,7 +65,7 @@ func (app *App) ChooseSession(index int) {
 	}
 }
 
-func (app *App) AddSession(session *Session) {
+func (app *App) AppendSession(session *Session) {
 	app.sessions = append(app.sessions, session)
 }
 

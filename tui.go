@@ -41,7 +41,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+w", "ctrl+\\":
 			// ctrl+\\: ctrl+backspace
 			m.app.DeleteWord()
-		case "backspace":
+		case "backspace", "ctrl+h":
 			m.app.DeleteChar()
 		default:
 			char := msg.Runes[0]
