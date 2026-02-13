@@ -125,7 +125,7 @@ func TestHandleKey(t *testing.T) {
 			}
 
 			for _, kp := range tt.Keypresses {
-				s.HandleKey(kp)
+				s.HandleKeypress(kp)
 			}
 			s.ComputeResult()
 			s1 := tt.Session
@@ -313,7 +313,7 @@ func TestDeleteWord(t *testing.T) {
 			}
 
 			for _, kp := range tt.Keypresses {
-				s.HandleKey(kp)
+				s.HandleKeypress(kp)
 			}
 
 			// special case handling
@@ -502,7 +502,7 @@ func TestDeleteChar(t *testing.T) {
 				t.Errorf("failed creating session: %s", err)
 			}
 			for _, kp := range tt.Keypresses {
-				s.HandleKey(kp)
+				s.HandleKeypress(kp)
 			}
 
 			// special case handling
@@ -705,7 +705,7 @@ func TestMissingKeys(t *testing.T) {
 				t.Errorf("failed creating session: %s", err)
 			}
 			for _, kp := range tt.Keypresses {
-				s.HandleKey(kp)
+				s.HandleKeypress(kp)
 			}
 			s.ComputeResult()
 			s1 := tt.Session
@@ -753,3 +753,5 @@ func CompareSessions(t *testing.T, actual Session, expected Session) {
 		}
 	}
 }
+
+// TODO: Add unit tests for Encode and Decode
