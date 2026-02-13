@@ -333,6 +333,193 @@ func TestDeleteWord(t *testing.T) {
 	}
 }
 
+func TestDeleteChar(t *testing.T) {
+	testCases := []struct {
+		Name       string
+		Text       io.Reader
+		Keypresses []rune
+		Session    Session
+	}{
+		{
+			"DeleteCharWhenAtTheBeginningOfTyping",
+			strings.NewReader("Hello"),
+			[]rune{},
+			Session{
+				CurrentWord: 0,
+				Words: []Word{
+					{
+						Text:     []rune("Hello"),
+						Progress: []rune(""),
+						Events:   []KeyEvent{},
+					},
+				},
+				Result: Result{Missing: []string{}},
+			},
+		},
+		{
+			"DeleteCharWhenAtTheBeginningOfNextWord",
+			strings.NewReader("Hello World"),
+			[]rune{'H', 'e', 'l', 'l', 'o', ' ', 'W'},
+			Session{
+				CurrentWord: 1,
+				Words: []Word{
+					{
+						Text:     []rune("Hello"),
+						Progress: []rune("Hello"),
+						Events: []KeyEvent{
+							{
+								Key:         'H',
+								ExpectedKey: 'H',
+							},
+							{
+								Key:         'e',
+								ExpectedKey: 'e',
+							},
+							{
+								Key:         'l',
+								ExpectedKey: 'l',
+							},
+							{
+								Key:         'l',
+								ExpectedKey: 'l',
+							},
+							{
+								Key:         'o',
+								ExpectedKey: 'o',
+							},
+						},
+					},
+					{
+						Text:     []rune("World"),
+						Progress: []rune(""),
+						Events: []KeyEvent{
+							{
+								Key:         'W',
+								ExpectedKey: 'W',
+							},
+						},
+					},
+				},
+				Result: Result{Missing: []string{}},
+			},
+		},
+		{
+			"DeleteCharTwoTimesWhenAtTheBeginningOfNextWord",
+			strings.NewReader("Hello World"),
+			[]rune{'H', 'e', 'l', 'l', 'o', ' ', 'W'},
+			Session{
+				CurrentWord: 0,
+				Words: []Word{
+					{
+						Text:     []rune("Hello"),
+						Progress: []rune("Hello"),
+						Events: []KeyEvent{
+							{
+								Key:         'H',
+								ExpectedKey: 'H',
+							},
+							{
+								Key:         'e',
+								ExpectedKey: 'e',
+							},
+							{
+								Key:         'l',
+								ExpectedKey: 'l',
+							},
+							{
+								Key:         'l',
+								ExpectedKey: 'l',
+							},
+							{
+								Key:         'o',
+								ExpectedKey: 'o',
+							},
+						},
+					},
+					{
+						Text:     []rune("World"),
+						Progress: []rune(""),
+						Events: []KeyEvent{
+							{
+								Key:         'W',
+								ExpectedKey: 'W',
+							},
+						},
+					},
+				},
+				Result: Result{Missing: []string{}},
+			},
+		},
+		{
+			"DeleteCharWhenAtTheEndOfCurrentWord",
+			strings.NewReader("Hello World"),
+			[]rune{'H', 'e', 'l', 'l', 'o', ' '},
+			Session{
+				CurrentWord: 0,
+				Words: []Word{
+					{
+						Text:     []rune("Hello"),
+						Progress: []rune("Hello"),
+						Events: []KeyEvent{
+							{
+								Key:         'H',
+								ExpectedKey: 'H',
+							},
+							{
+								Key:         'e',
+								ExpectedKey: 'e',
+							},
+							{
+								Key:         'l',
+								ExpectedKey: 'l',
+							},
+							{
+								Key:         'l',
+								ExpectedKey: 'l',
+							},
+							{
+								Key:         'o',
+								ExpectedKey: 'o',
+							},
+						},
+					},
+					{
+						Text:     []rune("World"),
+						Progress: []rune(""),
+						Events:   []KeyEvent{},
+					},
+				},
+				Result: Result{Missing: []string{}},
+			},
+		},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.Name, func(t *testing.T) {
+			// instanciate session
+			s, err := NewSession(tt.Text)
+			if err != nil {
+				t.Errorf("failed creating session: %s", err)
+			}
+			for _, kp := range tt.Keypresses {
+				s.HandleKey(kp)
+			}
+
+			// special case handling
+			numberOfDeletion := 1
+			if strings.Contains(tt.Name, "Two") {
+				numberOfDeletion += 1
+			}
+			for _ = range numberOfDeletion {
+				s.DeleteChar()
+			}
+			s.ComputeResult()
+			s1 := tt.Session
+			CompareSessions(t, *s, s1)
+		})
+	}
+}
+
 func TestMissingKeys(t *testing.T) {
 	testCases := []struct {
 		Name       string

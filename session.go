@@ -2,7 +2,9 @@ package typer
 
 import (
 	"encoding/json"
+	_ "fmt"
 	"io"
+	"slices"
 	"strings"
 	"time"
 	"unicode"
@@ -149,6 +151,17 @@ func (s *Session) DeleteWord() {
 	s.prevWord()
 	word = &s.Words[s.CurrentWord]
 	word.Progress = nil
+}
+
+func (s *Session) DeleteChar() {
+	word := &s.Words[s.CurrentWord]
+	if len(word.Progress) == 0 {
+		s.prevWord()
+		return
+	}
+	begin := max(len(word.Progress)-1, 0)
+	// remove the last element
+	word.Progress = slices.Delete(word.Progress, begin, begin+1)
 }
 
 func (s *Session) ComputeResult() {
