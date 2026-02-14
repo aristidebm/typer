@@ -76,10 +76,15 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	default:
 	}
-	// FIXME: Not working yet
 	if m.app.IsCompleted() {
 		m.app.ComputeResult()
-		m.app.Encode(os.Stdout)
+		f, err := os.Create("/tmp/result.json")
+		if err == nil {
+			if err := m.app.Encode(f); err != nil {
+				fmt.Fprint(f, "cannot encode")
+			}
+		}
+		defer f.Close()
 		return m, tea.Quit
 	}
 	m.viewport, cmd = m.viewport.Update(msg)

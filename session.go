@@ -2,7 +2,6 @@ package typer
 
 import (
 	"encoding/json"
-	"fmt"
 	_ "fmt"
 	"io"
 	"slices"
@@ -26,12 +25,10 @@ func (ke *KeyEvent) MarshalJSON() ([]byte, error) {
 		Key         string    `json:"key"`
 		Date        time.Time `json:"date"`
 		ExpectedKey string    `json:"expecteKey"`
-		Correct     bool      `json:"correct"`
 	}{
 		Key:         string(ke.Key),
 		Date:        ke.Date,
 		ExpectedKey: string(ke.ExpectedKey),
-		Correct:     !ke.IsMissed(),
 	}
 	return json.Marshal(&aux)
 }
@@ -123,10 +120,6 @@ func NewSession(r io.Reader) (*Session, error) {
 }
 
 func (s *Session) HandleKey(key rune) {
-	if s.CurrentWord >= len(s.Words) {
-		s.completeSession()
-		return
-	}
 	word := &s.Words[s.CurrentWord]
 	if len(word.Progress) >= len(word.Text) && unicode.IsSpace(key) {
 		// We have reached the end of the word go to the next word
@@ -144,6 +137,10 @@ func (s *Session) HandleKey(key rune) {
 		Date:        time.Now().UTC(),
 		ExpectedKey: expectedKey,
 	})
+	if s.CurrentWord >= len(s.Words)-1 && len(word.Progress) >= len(word.Text) {
+		s.completeSession()
+		return
+	}
 }
 
 func (s *Session) DeleteWord() {
@@ -198,7 +195,6 @@ func (s *Session) prevWord() {
 }
 
 func (s *Session) completeSession() {
-	fmt.Print("completing session")
 	s.completed = true
 }
 

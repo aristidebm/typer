@@ -31,9 +31,11 @@ func runTUI() error {
 	remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
 	and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 	`, 1))
+	// r := strings.NewReader("Hello, World")
 	app.CreateSession(r)
 	m := Model{app: app}
 	p := tea.NewProgram(m, tea.WithOutput(os.Stderr))
+	// p := tea.NewProgram(m, tea.WithOutput(os.Stderr), tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		return err
 	}

@@ -1,6 +1,7 @@
 package typer
 
 import (
+	_ "fmt"
 	"io"
 )
 
