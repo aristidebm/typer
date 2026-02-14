@@ -27,6 +27,27 @@ func (app *App) DeleteChar() {
 	}
 }
 
+func (app App) IsCompleted() bool {
+	if session := app.getCurrentSession(); session != nil {
+		return session.IsCompleted()
+	}
+	// we consider an app having no session to be completed
+	return true
+}
+
+func (app App) ComputeResult() {
+	if session := app.getCurrentSession(); session != nil {
+		session.ComputeResult()
+	}
+}
+
+func (app App) Encode(w io.Writer) error {
+	if session := app.getCurrentSession(); session != nil {
+		session.Encode(w)
+	}
+	return nil
+}
+
 func (app *App) CurrentWordIndex() int {
 	if session := app.getCurrentSession(); session != nil {
 		return session.CurrentWord

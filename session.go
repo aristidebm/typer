@@ -2,6 +2,7 @@ package typer
 
 import (
 	"encoding/json"
+	"fmt"
 	_ "fmt"
 	"io"
 	"slices"
@@ -101,6 +102,7 @@ type Session struct {
 	Words       []Word `json:"words"`
 	CurrentWord int    `json:"currentWord"`
 	Result      Result `json:"results"`
+	completed   bool
 }
 
 func DecodeSession(r io.Reader) (*Session, error) {
@@ -121,20 +123,22 @@ func NewSession(r io.Reader) (*Session, error) {
 }
 
 func (s *Session) HandleKey(key rune) {
+	if s.CurrentWord >= len(s.Words) {
+		s.completeSession()
+		return
+	}
 	word := &s.Words[s.CurrentWord]
 	if len(word.Progress) >= len(word.Text) && unicode.IsSpace(key) {
 		// We have reached the end of the word go to the next word
 		s.nextWord()
 		return
 	}
-
 	word.Progress = append(word.Progress, key)
 	expectedKeyIndex := min(len(word.Text), len(word.Progress)) - 1
 	expectedKey := word.Text[expectedKeyIndex]
 	if len(word.Progress) > len(word.Text) && !unicode.IsSpace(key) {
 		expectedKey = []rune(" ")[0]
 	}
-
 	word.Events = append(word.Events, KeyEvent{
 		Key:         key,
 		Date:        time.Now().UTC(),
@@ -177,6 +181,10 @@ func (s *Session) Encode(w io.Writer) error {
 	return enc.Encode(s)
 }
 
+func (s Session) IsCompleted() bool {
+	return s.completed
+}
+
 func (s *Session) nextWord() {
 	if s.CurrentWord < len(s.Words)-1 {
 		s.CurrentWord += 1
@@ -187,6 +195,11 @@ func (s *Session) prevWord() {
 	if s.CurrentWord > 0 {
 		s.CurrentWord -= 1
 	}
+}
+
+func (s *Session) completeSession() {
+	fmt.Print("completing session")
+	s.completed = true
 }
 
 func wordsFrom(r io.Reader) ([]Word, error) {
