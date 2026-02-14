@@ -125,7 +125,7 @@ func TestHandleKey(t *testing.T) {
 			}
 
 			for _, kp := range tt.Keypresses {
-				s.HandleKeypress(kp)
+				s.HandleKey(kp)
 			}
 			s.ComputeResult()
 			s1 := tt.Session
@@ -313,7 +313,7 @@ func TestDeleteWord(t *testing.T) {
 			}
 
 			for _, kp := range tt.Keypresses {
-				s.HandleKeypress(kp)
+				s.HandleKey(kp)
 			}
 
 			// special case handling
@@ -502,7 +502,7 @@ func TestDeleteChar(t *testing.T) {
 				t.Errorf("failed creating session: %s", err)
 			}
 			for _, kp := range tt.Keypresses {
-				s.HandleKeypress(kp)
+				s.HandleKey(kp)
 			}
 
 			// special case handling
@@ -705,7 +705,7 @@ func TestMissingKeys(t *testing.T) {
 				t.Errorf("failed creating session: %s", err)
 			}
 			for _, kp := range tt.Keypresses {
-				s.HandleKeypress(kp)
+				s.HandleKey(kp)
 			}
 			s.ComputeResult()
 			s1 := tt.Session
