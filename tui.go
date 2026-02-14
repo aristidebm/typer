@@ -69,14 +69,14 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.app.DeleteChar()
 			m.updateViewport()
 		default:
-			char := msg.Runes[0]
-			if unicode.IsPrint(char) {
-				m.app.HandleKey(char)
+			if len(msg.Runes) > 0 && unicode.IsPrint(msg.Runes[0]) {
+				m.app.HandleKey(msg.Runes[0])
 				m.updateViewport()
 			}
 		}
 	default:
 	}
+	// FIXME: Not working yet
 	if m.app.IsCompleted() {
 		m.app.ComputeResult()
 		m.app.Encode(os.Stdout)
