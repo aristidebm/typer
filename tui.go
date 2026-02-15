@@ -61,7 +61,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c":
 			return m, tea.Quit
-		case "ctrl+w", "ctrl+\\":
+		case "ctrl+w", "ctrl+backspace":
 			// ctrl+\\: ctrl+backspace
 			m.app.DeleteWord()
 			m.updateViewport()
@@ -93,7 +93,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) View() string {
-	return fmt.Sprintf("%s\n%s\n%s\n%s", m.inputView(), m.headerView(), m.viewport.View(), m.footerView())
+	return fmt.Sprintf("%s\n%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView(), m.inputView())
 }
 
 func (m Model) renderText() string {
