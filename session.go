@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 	"unicode"
+	_ "regexp"
 )
 
 type KeyEvent struct {
@@ -198,6 +199,8 @@ func (s *Session) completeSession() {
 	s.completed = true
 }
 
+// var _ = regexp.MustCompile(`[\p{L}\p{N}]+`)
+
 func wordsFrom(r io.Reader) ([]Word, error) {
 	data, err := io.ReadAll(r)
 	if err != nil {
@@ -205,8 +208,12 @@ func wordsFrom(r io.Reader) ([]Word, error) {
 	}
 
 	text := string(data)
-
 	var words []Word
+	// sequences := strings.FieldsFuncSeq(text, func(r rune) bool {
+	// 		// Split on anything that is NOT a letter or digit
+	// 		return !unicode.IsLetter(r) && !unicode.IsNumber(r)
+	// })
+	// for _, word := range wordRe.FindAllString(text, -1) {
 	for word := range strings.FieldsSeq(text) {
 		words = append(words, Word{Text: []rune(word)})
 	}
