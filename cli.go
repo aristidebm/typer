@@ -1,6 +1,7 @@
 package typer
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -31,11 +32,24 @@ func runTUI() error {
 	remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
 	and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 	`, 1))
-	// r := strings.NewReader("Hello, World")
-	app.CreateSession(r)
-	m := Model{app: app}
-	p := tea.NewProgram(m, tea.WithOutput(os.Stderr))
-	// p := tea.NewProgram(m, tea.WithOutput(os.Stderr), tea.WithAltScreen())
+
+	// Open TTY directly — stdin may be a pipe, stdout is reserved for output.
+	tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0)
+	if err != nil {
+		return fmt.Errorf("cannot open /dev/tty: %w", err)
+	}
+	defer tty.Close()
+
+	if err := app.CreateSession(r); err != nil {
+		return err
+	}
+
+	// Pass TTY to model so lipgloss detects color support against the real terminal.
+	m := NewModel(app, tty)
+	p := tea.NewProgram(m,
+		tea.WithInput(tty),
+		tea.WithOutput(tty), // draw on TTY directly — keeps stdout clean
+	)
 	if _, err := p.Run(); err != nil {
 		return err
 	}

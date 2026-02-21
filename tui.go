@@ -2,6 +2,7 @@ package typer
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"unicode"
@@ -11,29 +12,39 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-var (
-	titleStyle = func() lipgloss.Style {
-		b := lipgloss.RoundedBorder()
-		b.Right = "├"
-		return lipgloss.NewStyle().BorderStyle(b).Padding(0, 1)
-	}()
-
-	infoStyle = func() lipgloss.Style {
-		b := lipgloss.RoundedBorder()
-		b.Left = "┤"
-		return titleStyle.BorderStyle(b)
-	}()
-)
-
 type Model struct {
 	app      *App
 	width    int
 	height   int
 	viewport viewport.Model
+	renderer *lipgloss.Renderer
+}
+
+func NewModel(app *App, tty io.Writer) Model {
+	return Model{
+		app: app,
+		// For more information on why we need a custom renderer, check this link
+		// https://github.com/charmbracelet/lipgloss?tab=readme-ov-file#custom-renderers
+		// but basically I have noticed that without a custom renderer and the use of the tty
+		// colors disappear when typer is called in bash subshell to capture it's output.
+		renderer: lipgloss.NewRenderer(tty),
+	}
 }
 
 func (m Model) Init() tea.Cmd {
 	return nil
+}
+
+func (m Model) titleStyle() lipgloss.Style {
+	b := lipgloss.RoundedBorder()
+	b.Right = "├"
+	return m.renderer.NewStyle().BorderStyle(b).Padding(0, 1)
+}
+
+func (m Model) infoStyle() lipgloss.Style {
+	b := lipgloss.RoundedBorder()
+	b.Left = "┤"
+	return m.titleStyle().BorderStyle(b)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -56,7 +67,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.viewport.YPosition = headerHeight
 		// wrap text with lipgloss.NewStyle().Width(m.width).Render(...)
 		// https://github.com/charmbracelet/bubbles/issues/56#issuecomment-1073306054
-		m.viewport.SetContent(lipgloss.NewStyle().Width(m.width).Render(m.renderText()))
+		m.viewport.SetContent(m.renderer.NewStyle().Width(m.width).Render(m.renderText()))
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -98,7 +109,7 @@ func (m Model) View() string {
 
 func (m Model) renderText() string {
 	var renderer strings.Builder
-	currentWordStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#9BCED7")).Bold(true)
+	currentWordStyle := m.renderer.NewStyle().Foreground(lipgloss.Color("#9BCED7")).Bold(true)
 	var text string
 	for idx, word := range m.app.Words() {
 		text = string(word.Text)
@@ -107,12 +118,12 @@ func (m Model) renderText() string {
 			if idx == m.app.CurrentWordIndex() {
 				text = currentWordStyle.Render(text)
 			} else {
-				text = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFFF")).Render(text)
+				text = m.renderer.NewStyle().Foreground(lipgloss.Color("#FFFFF")).Render(text)
 			}
 		} else {
-			currentWordStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#9BCED7")).Bold(true)
-			missingStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#EA6F91"))
-			correctStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#31748E"))
+			currentWordStyle := m.renderer.NewStyle().Foreground(lipgloss.Color("#9BCED7")).Bold(true)
+			missingStyle := m.renderer.NewStyle().Foreground(lipgloss.Color("#EA6F91"))
+			correctStyle := m.renderer.NewStyle().Foreground(lipgloss.Color("#31748E"))
 
 			var buf strings.Builder
 			for idx, key := range word.Text {
@@ -139,13 +150,13 @@ func (m Model) renderText() string {
 }
 
 func (m Model) headerView() string {
-	title := titleStyle.Render("Page")
+	title := m.titleStyle().Render("Page")
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(title)))
 	return lipgloss.JoinHorizontal(lipgloss.Center, title, line)
 }
 
 func (m Model) footerView() string {
-	info := infoStyle.Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
+	info := m.infoStyle().Render(fmt.Sprintf("%3.f%%", m.viewport.ScrollPercent()*100))
 	line := strings.Repeat("─", max(0, m.viewport.Width-lipgloss.Width(info)))
 	return lipgloss.JoinHorizontal(lipgloss.Center, line, info)
 }
@@ -160,5 +171,5 @@ func (m Model) inputView() string {
 }
 
 func (m *Model) updateViewport() {
-	m.viewport.SetContent(lipgloss.NewStyle().Width(m.width).Render(m.renderText()))
+	m.viewport.SetContent(m.renderer.NewStyle().Width(m.width).Render(m.renderText()))
 }
