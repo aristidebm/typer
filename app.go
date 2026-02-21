@@ -75,14 +75,22 @@ func (app *App) LoadSession(r io.Reader) error {
 }
 
 func (app *App) DumpSession(w io.Writer, index int) error {
-	if 0 <= index && index < len(app.sessions) {
+	if app.isValidSessionIndex(index) {
 		return app.sessions[index].Encode(w)
 	}
 	return nil
 }
 
+func (app *App) NextSession(index int) {
+	app.ChooseSession(app.currentSession + 1)
+}
+
+func (app *App) PrevSession(index int) {
+	app.ChooseSession(app.currentSession - 1)
+}
+
 func (app *App) ChooseSession(index int) {
-	if 0 <= index && index < len(app.sessions) {
+	if app.isValidSessionIndex(index) {
 		app.currentSession = index
 	}
 }
@@ -99,8 +107,12 @@ func (app *App) Words() []Word {
 }
 
 func (app *App) getCurrentSession() *Session {
-	if 0 <= app.currentSession && app.currentSession < len(app.sessions) {
+	if app.isValidSessionIndex(app.currentSession) {
 		return app.sessions[app.currentSession]
 	}
 	return nil
+}
+
+func (app *App) isValidSessionIndex(index int) bool {
+	return 0 <= index && index < len(app.sessions)
 }
