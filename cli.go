@@ -2,6 +2,7 @@ package typer
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -18,20 +19,33 @@ You can provide text as arguments or pipe it in via stdin.
 Multiple formatting options can be applied simultaneously.`,
 	Args: cobra.ArbitraryArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		return runTUI()
+		var reader io.Reader
+		fmt.Print("Args", args)
+		if len(args) >= 1 && args[0] == "-" {
+			reader = os.Stdin
+		} else if len(args) >= 1 {
+			fp, err := os.Open(args[0])
+			if err != nil {
+				return err
+			}
+			defer fp.Close()
+			reader = fp
+		} else {
+			reader = strings.NewReader(strings.Repeat(`
+			Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+			Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+			when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+			It has survived not only five centuries, but also the leap into electronic typesetting,
+			remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+			and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+			`, 1))
+		}
+		return runTUI(reader)
 	},
 }
 
-func runTUI() error {
+func runTUI(r io.Reader) error {
 	app := &App{}
-	r := strings.NewReader(strings.Repeat(`
-	Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-	Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-	when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-	It has survived not only five centuries, but also the leap into electronic typesetting,
-	remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
-	and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-	`, 1))
 
 	// Open TTY directly — stdin may be a pipe, stdout is reserved for output.
 	tty, err := os.OpenFile("/dev/tty", os.O_RDWR, 0)
