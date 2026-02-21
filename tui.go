@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strings"
 	"unicode"
 
@@ -65,6 +66,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		m.viewport = viewport.New(m.width, m.height-verticalMarginHeight)
 		m.viewport.YPosition = headerHeight
+		km := viewport.DefaultKeyMap()
+
+		// Remove space binding
+		km.PageDown.SetKeys("pgdown", "f", "ctrl+f")
+		m.viewport.KeyMap = km
+
 		// wrap text with lipgloss.NewStyle().Width(m.width).Render(...)
 		// https://github.com/charmbracelet/bubbles/issues/56#issuecomment-1073306054
 		m.viewport.SetContent(m.renderer.NewStyle().Width(m.width).Render(m.renderText()))
@@ -92,13 +99,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		f, err := os.Create("/tmp/result.json")
 		if err == nil {
 			if err := m.app.Encode(f); err != nil {
-				fmt.Fprint(f, "cannot encode")
+				fmt.Fprint(f, "cannot encode session")
 			}
 		}
 		defer f.Close()
 		return m, tea.Quit
 	}
-	m.viewport, cmd = m.viewport.Update(msg)
+
+	// FIXME: viewport.Update() is handling space as pagedown and I do not find a way to handle that
+	// if k, ok := msg.(tea.KeyMsg); !ok || k.Type != tea.KeySpace {
+	// 	m.viewport, cmd = m.viewport.Update(msg)
+	// }
 	cmds = append(cmds, cmd)
 	return m, tea.Batch(cmds...)
 }
@@ -106,6 +117,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string {
 	return fmt.Sprintf("%s\n%s\n%s\n%s", m.headerView(), m.viewport.View(), m.footerView(), m.inputView())
 }
+
+const cursorMarker = "\x00"
+var ansiRe = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
 
 func (m Model) renderText() string {
 	var renderer strings.Builder
@@ -143,6 +157,8 @@ func (m Model) renderText() string {
 			}
 			text = buf.String()
 		}
+		// usefull to automatically scroll the viewport when we rich the end of the viewport
+		text = cursorMarker + text
 		renderer.WriteString(text)
 		renderer.WriteString(" ")
 	}
@@ -171,5 +187,23 @@ func (m Model) inputView() string {
 }
 
 func (m *Model) updateViewport() {
-	m.viewport.SetContent(m.renderer.NewStyle().Width(m.width).Render(m.renderText()))
+    rendered := m.renderer.NewStyle().Width(m.width).Render(m.renderText())
+    m.viewport.SetContent(rendered)
+
+    // Strip ANSI, find which line the marker is on
+    plain := ansiRe.ReplaceAllString(rendered, "")
+    lines := strings.Split(plain, "\n")
+    currentLine := 0
+    for i, line := range lines {
+        if strings.Contains(line, cursorMarker) {
+            currentLine = i
+            break
+        }
+    }
+
+    targetOffset := currentLine - (m.viewport.Height / 3)
+    if targetOffset < 0 {
+        targetOffset = 0
+    }
+    m.viewport.SetYOffset(targetOffset)
 }
