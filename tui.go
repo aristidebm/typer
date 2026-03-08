@@ -119,6 +119,7 @@ func (m Model) View() string {
 }
 
 const cursorMarker = "\x00"
+
 var ansiRe = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]`)
 
 func (m Model) renderText() string {
@@ -187,23 +188,23 @@ func (m Model) inputView() string {
 }
 
 func (m *Model) updateViewport() {
-    rendered := m.renderer.NewStyle().Width(m.width).Render(m.renderText())
-    m.viewport.SetContent(rendered)
+	rendered := m.renderer.NewStyle().Width(m.width).Render(m.renderText())
+	m.viewport.SetContent(rendered)
 
-    // Strip ANSI, find which line the marker is on
-    plain := ansiRe.ReplaceAllString(rendered, "")
-    lines := strings.Split(plain, "\n")
-    currentLine := 0
-    for i, line := range lines {
-        if strings.Contains(line, cursorMarker) {
-            currentLine = i
-            break
-        }
-    }
+	// Strip ANSI, find which line the marker is on
+	plain := ansiRe.ReplaceAllString(rendered, "")
+	lines := strings.Split(plain, "\n")
+	currentLine := 0
+	for i, line := range lines {
+		if strings.Contains(line, cursorMarker) {
+			currentLine = i
+			break
+		}
+	}
 
-    targetOffset := currentLine - (m.viewport.Height / 3)
-    if targetOffset < 0 {
-        targetOffset = 0
-    }
-    m.viewport.SetYOffset(targetOffset)
+	targetOffset := currentLine - (m.viewport.Height / 3)
+	if targetOffset < 0 {
+		targetOffset = 0
+	}
+	m.viewport.SetYOffset(targetOffset)
 }

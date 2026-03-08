@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	_ "fmt"
 	"io"
+	_ "regexp"
 	"slices"
 	"strings"
 	"time"
 	"unicode"
-	_ "regexp"
 )
 
 type KeyEvent struct {
@@ -97,9 +97,11 @@ type Result struct {
 }
 
 type Session struct {
-	Words       []Word `json:"words"`
-	CurrentWord int    `json:"currentWord"`
-	Result      Result `json:"results"`
+	Words       []Word    `json:"words"`
+	CurrentWord int       `json:"currentWord"`
+	Result      Result    `json:"results"`
+	StartedAt   time.Time `json:"startedAt"`
+	EndedAt     time.Time `json:"endedAt"`
 	completed   bool
 }
 
@@ -109,6 +111,9 @@ func DecodeSession(r io.Reader) (*Session, error) {
 	if err := dec.Decode(&s); err != nil {
 		return nil, err
 	}
+	if s.StartedAt.IsZero() {
+		s.StartedAt = time.Now().UTC()
+	}
 	return &s, nil
 }
 
@@ -117,7 +122,7 @@ func NewSession(r io.Reader) (*Session, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Session{Words: words}, nil
+	return &Session{Words: words, StartedAt: time.Now().UTC()}, nil
 }
 
 func (s *Session) HandleKey(key rune) {
@@ -183,6 +188,14 @@ func (s Session) IsCompleted() bool {
 	return s.completed
 }
 
+func (s Session) Duration() time.Duration {
+	EndedAt := s.EndedAt
+	if EndedAt.IsZero() {
+		EndedAt = time.Now().UTC()
+	}
+	return EndedAt.Sub(s.StartedAt)
+}
+
 func (s *Session) nextWord() {
 	if s.CurrentWord < len(s.Words)-1 {
 		s.CurrentWord += 1
@@ -197,6 +210,7 @@ func (s *Session) prevWord() {
 
 func (s *Session) completeSession() {
 	s.completed = true
+	s.EndedAt = time.Now()
 }
 
 // var _ = regexp.MustCompile(`[\p{L}\p{N}]+`)

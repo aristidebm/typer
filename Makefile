@@ -1,13 +1,13 @@
 .PHONY: format test build
 
+run:
+	@go run cmd/main.go
+
 format:
 	@go fmt ./...
 
 test:
 	@go test -v 
-
-run:
-	@go run cmd/main.go
 
 build:
 	@go build -o build/typer cmd/main.go
