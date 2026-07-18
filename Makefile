@@ -7,7 +7,10 @@ format:
 	@go fmt ./...
 
 test:
-	@go test -v 
+	@go test -v
 
 build:
 	@go build -o build/typer cmd/main.go
+
+install: build
+	cp build/typer ~/go/bin/
